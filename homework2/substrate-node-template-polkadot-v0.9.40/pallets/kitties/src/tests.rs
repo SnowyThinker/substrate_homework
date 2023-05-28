@@ -1,4 +1,4 @@
-use crate::{Error, mock::*};
+use crate::{Error, mock::*, Event};
 use frame_support::{assert_ok, assert_noop};
 
 #[test]
@@ -97,5 +97,8 @@ fn it_works_for_transfer() {
 
         // 最后判断kiity是符是最初的owner
         assert_eq!(KittiesModule::kitty_owner(kitty_id), Some(account_id));
+
+        // 接收最近转账的事件，并比较是符相同
+        System::assert_last_event(Event::KittyTransferred { who: recipient, recipient: account_id, kitty_id: kitty_id }.into());
     });
 }
