@@ -95,8 +95,7 @@ pub mod pallet {
 		pub fn revoke_claim(origin: OriginFor<T>, claim: Vec<u8>) -> DispatchResultWithPostInfo {
 			let sender = ensure_signed(origin)?;
 
-			let (_owner, error) = Proofs::<T>::get(&claim).ok_or(Error::<T>::ClaimNotExist)?;
-			println!("error: {:?}", error);
+			let (_owner, _error) = Proofs::<T>::get(&claim).ok_or(Error::<T>::ClaimNotExist)?;
 
 			let (owner, _) = Proofs::<T>::get(&claim).ok_or(Error::<T>::NotClaimOwner)?;
 			ensure!(owner == sender, Error::<T>::NotClaimOwner);
