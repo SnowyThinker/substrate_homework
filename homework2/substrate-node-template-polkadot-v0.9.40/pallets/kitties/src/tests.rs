@@ -6,9 +6,10 @@ fn it_works_for_create() {
     new_test_ext().execute_with(|| {
         let kitty_id = 0;
         let account_id = 1;
+        let name = *b"abcd1234";
 
         assert_eq!(KittiesModule::next_kitty_id(), kitty_id);
-        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));
+        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
 
         assert_eq!(KittiesModule::next_kitty_id(), kitty_id + 1);
         assert_eq!(KittiesModule::kitties(kitty_id).is_some(), true);
@@ -17,7 +18,7 @@ fn it_works_for_create() {
 
         crate::NextKittyId::<Test>::set(crate::KittyId::max_value());
         assert_noop!(
-            KittiesModule::create(RuntimeOrigin::signed(account_id)),
+            KittiesModule::create(RuntimeOrigin::signed(account_id), name),
             Error::<Test>::InvalidKittyId,
         );
     });
@@ -28,26 +29,37 @@ fn it_works_for_breed() {
     new_test_ext().execute_with(|| {
         let kitty_id = 0;
         let account_id = 1;
+        let name = [
+            u8::from_str_radix("A", 16).unwrap(), 
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(), 
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+        ];
 
         assert_noop!(
-            KittiesModule::breed(RuntimeOrigin::signed(account_id), kitty_id, kitty_id),
+            KittiesModule::breed(RuntimeOrigin::signed(account_id), kitty_id, kitty_id, name),
             Error::<Test>::SameKittyId
         );
 
         assert_noop!(
-            KittiesModule::breed(RuntimeOrigin::signed(account_id), kitty_id, kitty_id + 1),
+            KittiesModule::breed(RuntimeOrigin::signed(account_id), kitty_id, kitty_id + 1, name),
             Error::<Test>::InvalidKittyId
         );
 
-        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));
-        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));
+        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
+        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
 
         assert_eq!(KittiesModule::next_kitty_id(), kitty_id + 2);
 
         assert_ok!(KittiesModule::breed(
             RuntimeOrigin::signed(account_id), 
             kitty_id, 
-            kitty_id + 1
+            kitty_id + 1,
+            name
         ));
 
         let breed_kitty_id = 2;
@@ -69,8 +81,18 @@ fn it_works_for_transfer() {
         let kitty_id = 0;
         let account_id = 1;
         let recipient = 2;
+        let name = [
+            u8::from_str_radix("A", 16).unwrap(), 
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(), 
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+            u8::from_str_radix("A", 16).unwrap(),
+        ];
 
-        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));
+        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
         assert_eq!(KittiesModule::kitty_owner(kitty_id), Some(account_id));
 
         // 从recipient 转账到account 会报错
@@ -100,5 +122,25 @@ fn it_works_for_transfer() {
 
         // 接收最近转账的事件，并比较是符相同
         System::assert_last_event(Event::KittyTransferred { who: recipient, recipient: account_id, kitty_id: kitty_id }.into());
+    });
+}
+
+#[test]
+fn it_works_for_buy() {
+    new_test_ext().execute_with(|| {
+        let kitty_id = 0;
+        let account_id = 1;
+        let name = *b"abcd1234";
+
+        KittiesModule::create(RuntimeOrigin::signed(account_id), name).unwrap();
+
+        assert_noop!(
+            KittiesModule::buy(
+                RuntimeOrigin::signed(account_id), 
+                kitty_id
+            ),
+            Error::<Test>::AlreadyOwned
+        );
+
     });
 }

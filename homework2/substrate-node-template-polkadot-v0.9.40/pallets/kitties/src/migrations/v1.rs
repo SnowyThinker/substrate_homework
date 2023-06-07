@@ -32,7 +32,7 @@ pub fn migrate<T: Config>() -> Weight {
         // let kitty_id = index as u32;
         let new_kitty = Kitty {
             dna: kitty.0,
-            name: *b"abcd",
+            name: *b"abcd1234",
         };
 
         Kitties::<T>::insert(index, &new_kitty);
