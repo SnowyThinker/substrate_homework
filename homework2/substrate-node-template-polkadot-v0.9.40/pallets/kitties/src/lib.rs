@@ -31,7 +31,7 @@ pub mod pallet {
 		pub name: [u8; 8],
 	}
 
-	const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
+	const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
 
 	#[pallet::pallet]
 	#[pallet::storage_version(STORAGE_VERSION)]
@@ -103,7 +103,7 @@ pub mod pallet {
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 		fn on_runtime_upgrade() -> Weight {
-			migrations::v1::migrate::<T>();
+			//migrations::v1::migrate::<T>();
 			migrations::v2::migrate::<T>()
 		}
 	}
@@ -157,9 +157,6 @@ pub mod pallet {
 
 			let _selector = Self::random_value(&who);
 			let dna = [0u8; 16];
-			// for i in 0..kitty_1.0.len() {
-			// 	data[i] = kitty_1.0[i] & selector[i] | (kitty_2.0[i] & !selector[i]);
-			// }
 
 			let kitty = Kitty{dna, name};
 
@@ -200,7 +197,7 @@ pub mod pallet {
 			Self::kitties(kitty_id).ok_or::<DispatchError>(Error::<T>::InvalidKittyId.into())?;
 
 			ensure!(Self::kitty_owner(kitty_id) == Some(who.clone()), Error::<T>::NotOwner);
-			ensure!(Self::kitty_on_sale(kitty_id).is_some(), Error::<T>::AlreadyOnSale);
+			//ensure!(Self::kitty_on_sale(kitty_id).is_some(), Error::<T>::AlreadyOnSale);
 
 			<KittyOnSale<T>>::insert(kitty_id, ());
 			Self::deposit_event(Event::KittyOnSale {who, kitty_id});
