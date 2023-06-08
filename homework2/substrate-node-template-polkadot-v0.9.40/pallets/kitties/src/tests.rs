@@ -11,6 +11,8 @@ fn it_works_for_create() {
         assert_eq!(KittiesModule::next_kitty_id(), kitty_id);
         assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
 
+        // let _res = Balances::set_balance(RuntimeOrigin::signed(account_id), account_id, 1_000_000_000, 1_000_000_000);
+
         assert_eq!(KittiesModule::next_kitty_id(), kitty_id + 1);
         assert_eq!(KittiesModule::kitties(kitty_id).is_some(), true);
         assert_eq!(KittiesModule::kitty_owner(kitty_id), Some(account_id));
@@ -29,16 +31,7 @@ fn it_works_for_breed() {
     new_test_ext().execute_with(|| {
         let kitty_id = 0;
         let account_id = 1;
-        let name = [
-            u8::from_str_radix("A", 16).unwrap(), 
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(), 
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-        ];
+        let name = *b"abcd1234";
 
         assert_noop!(
             KittiesModule::breed(RuntimeOrigin::signed(account_id), kitty_id, kitty_id, name),
@@ -81,16 +74,9 @@ fn it_works_for_transfer() {
         let kitty_id = 0;
         let account_id = 1;
         let recipient = 2;
-        let name = [
-            u8::from_str_radix("A", 16).unwrap(), 
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(), 
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-            u8::from_str_radix("A", 16).unwrap(),
-        ];
+        let name = *b"abcd1234";
+
+        // let _res = Balances::set_balance(RuntimeOrigin::signed(account_id), account_id, 1_000_000_000, 1_000_000_000);
 
         assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id), name));
         assert_eq!(KittiesModule::kitty_owner(kitty_id), Some(account_id));

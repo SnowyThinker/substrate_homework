@@ -69,7 +69,7 @@ impl frame_system::Config for Test {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 500;
+pub const EXISTENTIAL_DEPOSIT: u128 = 5000;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -77,6 +77,7 @@ pub type Balance = u128;
 parameter_types! {
 	pub KittyPalletId: PalletId = PalletId(*b"py/kitty");
 	pub KittyPrice: Balance = EXISTENTIAL_DEPOSIT * 10;
+	// pub KittyPrice: Balance = 10;
 }
 
 impl pallet_kitties::Config for Test {
@@ -93,7 +94,17 @@ impl pallet_insecure_randomness_collective_flip::Config for Test {
 
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	let mut ext: sp_io::TestExternalities = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap().into();
-	ext.execute_with(|| System::set_block_number(1));
+	// let mut ext: sp_io::TestExternalities = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap().into();
+	// ext.execute_with(|| System::set_block_number(1));
+	// ext
+
+	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	pallet_balances::GenesisConfig::<Test> {
+		balances: vec![(1, 1000000000), (2, 100000000000)],
+	}
+	.assimilate_storage(&mut t)
+	.unwrap();
+
+	let ext = sp_io::TestExternalities::new(t);
 	ext
 }
