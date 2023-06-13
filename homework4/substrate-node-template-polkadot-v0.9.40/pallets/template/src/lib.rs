@@ -23,10 +23,6 @@ pub mod pallet {
 		offchain::storage::{StorageValueRef, StorageRetrievalError, MutateStorageError}, 
 		traits::Zero,
 	};
-	// use sp_io::offchain_index;
-	// use serde::Deserialize;
-	// use core::primitive::str;
-	// use std::str;
 
 	pub const ONCHAIN_TX_KEY: &[u8] = b"My_pallet::indexing1";
 
@@ -113,21 +109,6 @@ pub mod pallet {
 				},
 			}
 		}
-
-		// #[pallet::call_index(2)]
-		// #[pallet::weight(100)]
-		// pub fn extrinsic(origin: OriginFor<T>, number: u64) -> DispatchResult {
-		// 	let who = ensure_signed(origin)?;
-
-		// 	let key = Self::derived_key(Pallet::<T>::block_number());
-		// 	let data = IndexingData(b"submit_number_unsigned".to_vec(), number);
-
-		// 	log::info!("extrinsic ==> who: {:?}, key: {:?}, number: {:?}", who, key, number);
-
-		// 	offchain_index::set(&key, &data.encode());
-
-		// 	Ok(())
-		// }
 	}
 
 	impl<T: Config> Pallet<T> {
@@ -188,15 +169,6 @@ pub mod pallet {
 			}
 
 			log::info!("OCW ==> Leave from offchain workers!: {:?}", block_number);
-
-			// let key = Self::derived_key(block_number);
-			// let storage_ref = StorageValueRef::persistent(&key);
-
-			// if let Ok(Some(data)) = storage_ref.get::<IndexingData>() {
-			// 	log::info!("local storage data: {:?}, {:?}", data.0, data.1);
-			// } else {
-			// 	log::info!("Error reading from local storage.");
-			// }
 		}
 	}
 }
