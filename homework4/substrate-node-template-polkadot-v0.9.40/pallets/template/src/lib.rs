@@ -19,9 +19,12 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 	use frame_support::inherent::Vec;
-	use sp_runtime::{offchain::storage::StorageValueRef};
+	use sp_runtime::{
+		offchain::storage::{StorageValueRef, StorageRetrievalError, MutateStorageError}, 
+		traits::Zero,
+	};
 	// use sp_io::offchain_index;
-	use serde::Deserialize;
+	// use serde::Deserialize;
 	// use core::primitive::str;
 	// use std::str;
 
@@ -145,14 +148,55 @@ pub mod pallet {
 		fn offchain_worker(block_number: T::BlockNumber) {
 			log::info!("OCW ==> hello world from offchain workers!: {:?}", block_number);
 
-			let key = Self::derived_key(block_number);
-			let storage_ref = StorageValueRef::persistent(&key);
+			if block_number % 2u32.into() != Zero::zero() {
+				//odd
+				let key = Self::derived_key(block_number);
+				let val_ref = StorageValueRef::persistent(&key);
 
-			if let Ok(Some(data)) = storage_ref.get::<IndexingData>() {
-				log::info!("local storage data: {:?}, {:?}", data.0, data.1);
+				//
+				let random_slice = sp_io::offchain::random_seed();
+				let timestamp_u64 = sp_io::offchain::timestamp().unix_millis();
+
+				let value = (random_slice, timestamp_u64);
+				log::info!("OCW ==> in odd block, value to write: {:?}", value);
+
+				struct StateError;
+
+				let res = val_ref.mutate(|val: Result<Option<([u8; 32], u64)>, StorageRetrievalError>| -> Result<_, StateError> {
+					match val {
+						Ok(Some(_)) => Ok(value),
+						_ => Ok(value),
+					}
+				});
+
+				match res {
+					Ok(value) => {
+						log::info!("OCW ==> in odd block, mutate successfully: {:?}", value);
+					},
+					Err(MutateStorageError::ValueFunctionFailed(_)) => (),
+					Err(MutateStorageError::ConcurrentModification(_)) => (),
+				}
 			} else {
-				log::info!("Error reading from local storage.");
+				//even
+				let key = Self::derived_key(block_number - 1u32.into());
+				let mut val_ref = StorageValueRef::persistent(&key);
+
+				if let Ok(Some(value)) = val_ref.get::<([u8;32], u64)>() {
+					log::info!("OCW ==> in even block, value read: {:?}", value);
+					val_ref.clear();
+				}
 			}
+
+			log::info!("OCW ==> Leave from offchain workers!: {:?}", block_number);
+
+			// let key = Self::derived_key(block_number);
+			// let storage_ref = StorageValueRef::persistent(&key);
+
+			// if let Ok(Some(data)) = storage_ref.get::<IndexingData>() {
+			// 	log::info!("local storage data: {:?}, {:?}", data.0, data.1);
+			// } else {
+			// 	log::info!("Error reading from local storage.");
+			// }
 		}
 	}
 }
