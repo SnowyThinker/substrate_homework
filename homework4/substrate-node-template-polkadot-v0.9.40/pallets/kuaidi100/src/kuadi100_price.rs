@@ -5,6 +5,7 @@ use scale_info::TypeInfo;
 use serde::{Deserialize, Deserializer};
 use sp_core::ConstU32;
 use sp_runtime::BoundedVec;
+use frame_support::inherent::Vec;
 
 
 /// 快递100价格查询返回的数据
