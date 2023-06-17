@@ -2,18 +2,10 @@ import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair} from '@polkadot/keyring/types';
 import { metadata} from '@polkadot/types/interfaces/essentials';
 import '@polkadot/api-augment';
-// import { resolve } from "path";
 
 
 const WEB_SOCKET = 'ws://127.0.0.1:9944';
-// const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-// const sleep = (waitSeconds) => {
-//     return new Promise<void>(resolve => {
-//         setTimeout(() => {
-// 			resolve()
-// 		}, waitSeconds * 1000)
-//     })
-// }
+
 
 const connectSubstrate = async() => {
     const wsProvider = new WsProvider(WEB_SOCKET);
@@ -56,19 +48,49 @@ const transferFromAliceToBob = async (api: ApiPromise, amount: number) => {
         });
 }
 
+// subscribe balance change
+const subscribeAliceBalance = async (api: ApiPromise) => {
+    const keyring = new Keyring({ type: 'sr25519'});
+    const alice = keyring.addFromUri('//Alice');
+    await api.query.system.account(alice.address, aliceAcct => {
+        console.log('subscribed to Alice account.');
+        const aliceFreeSub = aliceAcct.data.free;
+        console.log(`Alice Account (sub): ${aliceFreeSub}`);
+    });
+}
+
+// get metadata
+const getMetadata = async(api: ApiPromise) => {
+    const metadata = await api.rpc.state.getMetadata();
+    console.log('print metadata:');
+    console.log(metadata);
+    return metadata;
+} 
+
+// const getStorage =async (api: ApiPromise) => {
+//     // let kind: StorageKind = ''; 
+//     // let key: Bytes = '';
+//     api.rpc.offchain.localStorageGet(kind, key);
+// }
+
 function sleep(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
 const main = async() => {
     const api = await connectSubstrate();
-    console.log('const value existentialDeposit is:', await getConst(api));
+    // console.log('const value existentialDeposit is:', await getConst(api));
 
-    await printAliceBobBalance(api);
-    await transferFromAliceToBob(api, 10 * 12);
-    await sleep(6000);
+    // await printAliceBobBalance(api);
+    // await transferFromAliceToBob(api, 10 * 12);
+    // await sleep(6000);
 
-    await printAliceBobBalance(api);
+    // await printAliceBobBalance(api);
+    // await subscribeAliceBalance(api);
+    // await sleep(600000);
+
+    await getMetadata(api);
+
     console.log("game over");
 };
 
