@@ -70,8 +70,8 @@ const getMetadata = async(api: ApiPromise) => {
 
 const getStorage = async (api: ApiPromise) => {
     // let kind = 'PERSISTENT'; 
-    let key = 'kuaidi100::indexing_parcel_weight';
-    let value = await api.rpc.offchain.localStorageGet("PERSISTENT", key);
+    // let key = 'kuaidi100::indexing_parcel_weight';
+    let value = await api.rpc.offchain.localStorageGet("PERSISTENT", "kuaidi100::indexing_parcel_weight");
 
     const hexValue = value.toHex();
     const u8aValue = new Uint8Array(

@@ -163,7 +163,7 @@ pub mod pallet {
             let parcel_weight = Self::get_parcel_weight_from_storage();
 
             if let Ok(info) = Self::fetch_kuaidi100_price_info(parcel_weight) {
-                log::info!("OCW ==> kuaidi100 price info: {:#?}", info);
+                // log::info!("OCW ==> kuaidi100 price info: {:#?}", info);
 
                 let signer = Signer::<T, T::AuthorityId>::any_account();
 
