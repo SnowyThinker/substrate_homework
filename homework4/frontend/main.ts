@@ -2,6 +2,7 @@ import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair} from '@polkadot/keyring/types';
 import { metadata} from '@polkadot/types/interfaces/essentials';
 import '@polkadot/api-augment';
+const { u8aToString } = require("@polkadot/util");
 
 
 const WEB_SOCKET = 'ws://127.0.0.1:9944';
@@ -67,11 +68,20 @@ const getMetadata = async(api: ApiPromise) => {
     return metadata;
 } 
 
-// const getStorage =async (api: ApiPromise) => {
-//     // let kind: StorageKind = ''; 
-//     // let key: Bytes = '';
-//     api.rpc.offchain.localStorageGet(kind, key);
-// }
+const getStorage = async (api: ApiPromise) => {
+    // let kind = 'PERSISTENT'; 
+    let key = 'kuaidi100::indexing_parcel_weight';
+    let value = await api.rpc.offchain.localStorageGet("PERSISTENT", key);
+
+    const hexValue = value.toHex();
+    const u8aValue = new Uint8Array(
+        (hexValue.match(/.{1,2}/g) || []).map((byte) => parseInt(byte, 16))
+    );
+
+    const stringValue = u8aToString(u8aValue);
+
+    console.log("value in offchain storage: ", stringValue);
+}
 
 function sleep(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
@@ -89,7 +99,8 @@ const main = async() => {
     // await subscribeAliceBalance(api);
     // await sleep(600000);
 
-    await getMetadata(api);
+    // await getMetadata(api);
+    await getStorage(api);
 
     console.log("game over");
 };

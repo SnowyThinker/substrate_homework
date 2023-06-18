@@ -1,9 +1,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-// pub use pallet::*;
-use sp_core::crypto::KeyTypeId;
+/// Edit this file to define custom logic or remove it if it is not needed.
+/// Learn more about FRAME and the core library of Substrate FRAME pallets:
+/// <https://docs.substrate.io/reference/frame-pallets/>
+pub use pallet::*;
 
 mod kuaidi100_price;
+
+use sp_core::crypto::KeyTypeId;
 
 pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"btc!");
 
@@ -53,11 +57,11 @@ pub mod pallet {
 
     const ONCHAIN_TX_KEY: &[u8] = b"kuaidi100::indexing_parcel_weight";
 
-    #[derive(Encode, Decode, Clone, PartialEq, RuntimeDebug, scale_info::TypeInfo)]
-    pub struct Payload<Public> {
-        kuaidi100_price_data: BoundedVec<Kuaidi100Price, ConstU32<10>>,
-        public: Public,
-    }
+	#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, scale_info::TypeInfo)]
+	pub struct Payload<Public> {
+		kuaidi100_price_data: BoundedVec<Kuaidi100Price, ConstU32<10>>,
+		public: Public,
+	}
 
     impl<T: SigningTypes> SignedPayload<T> for Payload<T::Public> {
         fn public(&self) -> T::Public {
@@ -80,7 +84,7 @@ pub mod pallet {
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
-        ParceWeightStored {parcel_weight: BoundedVec<u8, ConstU32<4>>, who: T::AccountId},
+        ParcelWeightStored {parcel_weight: BoundedVec<u8, ConstU32<4>>, who: T::AccountId},
     }
 
 
@@ -120,11 +124,10 @@ pub mod pallet {
 
             sp_io::offchain_index::set(&ONCHAIN_TX_KEY, &data.encode());
 
-            Self::deposit_event(Event::ParceWeightStored {parcel_weight, who: _who});
-
-            Ok(())
-        }
-    }
+			Self::deposit_event(Event::ParcelWeightStored { parcel_weight, who: _who });
+			Ok(())
+		}
+	}
 
     #[pallet::validate_unsigned]
     impl<T: Config> ValidateUnsigned for Pallet<T> {
