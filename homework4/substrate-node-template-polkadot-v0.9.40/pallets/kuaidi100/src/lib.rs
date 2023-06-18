@@ -3,7 +3,7 @@
 // pub use pallet::*;
 use sp_core::crypto::KeyTypeId;
 
-mod kuadi100_price;
+mod kuaidi100_price;
 
 pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"btc!");
 
@@ -49,7 +49,7 @@ pub mod pallet {
 		transaction_validity::{InvalidTransaction, TransactionValidity, ValidTransaction},
 		RuntimeDebug,
 	};
-    use crate::kuadi100_price::{Kuaidi100Price, Kuaidi100PriceResponse};
+    use crate::kuaidi100_price::{Kuaidi100Price, Kuaidi100PriceResponse};
 
     const ONCHAIN_TX_KEY: &[u8] = b"kuaidi100::indexing_parcel_weight";
 
