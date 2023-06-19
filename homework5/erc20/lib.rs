@@ -47,9 +47,10 @@ mod erc20 {
             let mut balances = Mapping::new();
             balances.insert(Self::env().caller(), &total_supply);
 
+            // event from 为空， to  为自身
             Self::env().emit_event({
                 Transfer {
-                    from: Some(Self::env().caller()),
+                    from: None,
                     to: Some(Self::env().caller()),
                     value: total_supply,
                 }
@@ -151,12 +152,18 @@ mod erc20 {
 
             match decoded {
                 Event::Transfer(Transfer {from, to, value}) => {
-                    assert!(from.is_some(), "mint from error");
+                    assert!(from.is_none(), "mint from error");
                     assert_eq!(to, Some(accounts.alice), "mint to error");       
                     assert_eq!(value, 10000, "mint value error");
                 },
                 _ => panic!("match error"), 
             }
+        }
+
+        #[ink(test)]
+        fn transfer_should_work() {
+            let erc20 = Erc20::new(10000);
+
         }
     }
 
