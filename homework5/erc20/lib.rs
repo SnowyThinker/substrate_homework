@@ -23,9 +23,9 @@ mod erc20 {
     #[ink(event)]
     pub struct Transfer {
         #[ink(topic)]
-        from: AccountId,
+        from: Option<AccountId>,
         #[ink(topic)]
-        to: AccountId,
+        to: Option<AccountId>,
         value: Balance,
     }
 
@@ -46,6 +46,14 @@ mod erc20 {
         pub fn new(total_supply: Balance) -> Self {
             let mut balances = Mapping::new();
             balances.insert(Self::env().caller(), &total_supply);
+
+            Self::env().emit_event({
+                Transfer {
+                    from: Some(Self::env().caller()),
+                    to: Some(Self::env().caller()),
+                    value: total_supply,
+                }
+            });
 
             Self { 
                 total_supply,  
@@ -113,8 +121,8 @@ mod erc20 {
 
             self.env().emit_event({
                 Transfer {
-                    from: *from,
-                    to: *to,
+                    from: Some(*from),
+                    to: Some(*to),
                     value,
                 }
             });
@@ -123,28 +131,32 @@ mod erc20 {
         }
     }
 
-    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
-    /// module and test functions are marked with a `#[test]` attribute.
-    /// The below code is technically just normal Rust code.
     #[cfg(test)]
     mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
         use super::*;
 
-        /// We test if the default constructor does its job.
-        #[ink::test]
-        fn default_works() {
-            // let erc20 = Erc20::default();
-            // assert_eq!(erc20.get(), false);
-        }
+        type Event = <Erc20 as ::ink::reflect::ContractEventBase>::Type;
 
-        /// We test a simple use case of our contract.
         #[ink::test]
-        fn it_works() {
-            // let mut erc20 = Erc20::new(false);
-            // assert_eq!(erc20.get(), false);
-            // erc20.flip();
-            // assert_eq!(erc20.get(), true);
+        fn constructor_works() {
+            let erc20 = Erc20::new(10000);
+            let accounts = ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
+
+            assert_eq!(erc20.total_supply(), 10000);
+            assert_eq!(erc20.balance_of(accounts.alice), 10000);
+
+            let emitted_events = ink::env::test::recorded_events().collect::<Vec<_>>();
+            let event = &emitted_events[0];
+            let decoded = <Event as scale::Decode>::decode(&mut &event.data[..]).expect("decoded error");
+
+            match decoded {
+                Event::Transfer(Transfer {from, to, value}) => {
+                    assert!(from.is_some(), "mint from error");
+                    assert_eq!(to, Some(accounts.alice), "mint to error");       
+                    assert_eq!(value, 10000, "mint value error");
+                },
+                _ => panic!("match error"), 
+            }
         }
     }
 
