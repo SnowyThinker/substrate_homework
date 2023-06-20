@@ -31,3 +31,14 @@ cargo install cargo-expand
 ~~~shell
 cargo expand --lib > out.rs
 ~~~
+
+* 运行单元测试
+
+~~~shell
+export CONTRACTS_NODE=/Users/andrew/workbench/souce/rust/substrate-contracts-node/target/release/substrate-contracts-node
+cargo test --release --features e2e-tests
+~~~
+
+
+![Erc20作业](image-1.png)
+![Erc20单元测试](image.png)
