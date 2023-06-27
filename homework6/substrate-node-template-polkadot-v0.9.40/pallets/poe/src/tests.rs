@@ -1,3 +1,4 @@
+use super::*;
 use crate::{mock::*, Error, Event};
 use frame_support::{assert_noop, assert_ok};
 use sp_runtime::BoundedVec;
@@ -6,7 +7,7 @@ use sp_runtime::BoundedVec;
 fn create_claim_wroks() {
 	new_test_ext().execute_with(|| {
 		let claim = BoundedVec::try_from(vec![0, 1]).unwrap();
-		assert_ok!(PeoModule::create_claim(RuntimeOrigin::signed(1), claim.clone()));
+		assert_ok!(PoeModule::create_claim(RuntimeOrigin::signed(1), claim.clone()));
 
 		assert_eq!(
 			Proofs::<Test>::get(&claim),
