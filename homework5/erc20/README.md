@@ -42,3 +42,10 @@ cargo test --release --features e2e-tests
 
 ![Erc20作业](image-1.png)
 ![Erc20单元测试](image.png)
+
+
+* 新合约
+
+~~~shell
+cargo contract new trait_erc20
+~~~
