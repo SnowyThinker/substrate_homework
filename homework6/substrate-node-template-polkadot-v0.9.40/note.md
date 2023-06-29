@@ -35,3 +35,8 @@ cargo build --release --features runtime-benchmarks
 > --output ./pallets/poe/src/weights.rs \
 > --template .maintain/frame-weight-template.hbs
 ~~~
+
+
+![Alt text](image.png)
+
+
